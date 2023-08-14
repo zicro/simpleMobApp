@@ -11,11 +11,13 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.authcrud.Controller.SessionManager;
+import com.example.authcrud.Controller.VolleySingleton;
 import com.example.authcrud.MainActivity;
 import com.example.authcrud.Model.User;
 import com.example.authcrud.R;
@@ -23,6 +25,9 @@ import com.example.authcrud.SERVER.URLs;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -104,9 +109,25 @@ public class RegisterActivity extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getApplicationContext(), error.toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }
-        );
+        ){
+            @Override
+            protected Map<String,String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+
+                params.put("Content-Type", "application/json");
+                params.put("name", myName);
+                params.put("email", myEmail);
+                params.put("password", myPassword);
+                params.put("c_password", myPassword);
+
+                return params;
+            }
+
+        };
+
+        VolleySingleton.getInstance(this).addToRequestQueue(stringRequest);
     }
 }
